@@ -1,0 +1,100 @@
+{
+  "info": {
+    "_postman_id": "6c8a76de-coupon-system-nativewit",
+    "name": "One-Time Coupon System",
+    "description": "NativeWit technical assessment - One-Time Coupon System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Validate Coupon - Valid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"user-123\",\n  \"coupon_code\": \"WELCOME100\",\n  \"amount\": 1000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/validate-coupon",
+          "host": ["{{baseUrl}}"],
+          "path": ["validate-coupon"]
+        }
+      }
+    },
+    {
+      "name": "Apply Coupon",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"user-123\",\n  \"coupon_code\": \"WELCOME100\",\n  \"amount\": 1000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/apply-coupon",
+          "host": ["{{baseUrl}}"],
+          "path": ["apply-coupon"]
+        }
+      }
+    },
+    {
+      "name": "Validate Coupon - Nonexistent",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"user-123\",\n  \"coupon_code\": \"WRONG100\",\n  \"amount\": 1000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/validate-coupon",
+          "host": ["{{baseUrl}}"],
+          "path": ["validate-coupon"]
+        }
+      }
+    },
+    {
+      "name": "Validate Coupon - Inactive",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"user-123\",\n  \"coupon_code\": \"INACTIVE100\",\n  \"amount\": 1000\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/validate-coupon",
+          "host": ["{{baseUrl}}"],
+          "path": ["validate-coupon"]
+        }
+      }
+    }
+  ]
+}
