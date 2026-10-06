@@ -40,3 +40,5 @@ Thumbs.db
 
 ### Postman local metadata ###
 .postman/
+postman/collections/
+postman/globals/
