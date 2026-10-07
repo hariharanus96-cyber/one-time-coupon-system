@@ -137,8 +137,8 @@ Request C ──┘
            COMMIT
              |
              v
- other requests acquire the lock
- and detect existing redemption
+other requests acquire the lock
+and detect existing redemption
 ```
 
 Therefore, concurrent requests for the same user and coupon are serialized.
@@ -196,7 +196,16 @@ No successful transaction or redemption is persisted, so the user can retry the 
 - Docker Desktop / Docker Engine
 - Docker Compose
 
-Clone the repository and run:
+No local Java, Maven, PostgreSQL, or IDE configuration is required when running the application with Docker Compose.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/hariharanus96-cyber/one-time-coupon-system.git
+cd one-time-coupon-system
+```
+
+Start the complete application:
 
 ```bash
 docker compose up --build
@@ -207,7 +216,7 @@ Docker Compose starts:
 - PostgreSQL 17
 - Spring Boot application
 
-The application is available at:
+Once startup is complete, the application is available at:
 
 ```text
 http://localhost:8080
@@ -239,13 +248,27 @@ docker compose down -v
 
 ## Running Locally
 
-Start PostgreSQL:
+### Prerequisites
+
+- Java 17
+- PostgreSQL 17, or Docker for running PostgreSQL
+- Maven installation is not required because the Maven Wrapper (`mvnw` / `mvnw.cmd`) is included
+
+Verify Java:
+
+```bash
+java -version
+```
+
+The application requires Java 17. Any compatible Java 17 JDK distribution can be used for local development.
+
+If PostgreSQL is being run through Docker, start it with:
 
 ```bash
 docker compose up -d postgres
 ```
 
-Then run the Spring Boot application:
+Then run the Spring Boot application.
 
 ### Windows
 
@@ -305,7 +328,7 @@ docker compose up --build
 
 Tests use Testcontainers with a real PostgreSQL database rather than an in-memory database.
 
-Run:
+Docker must be running because Testcontainers starts a PostgreSQL container during the integration tests.
 
 ### Windows
 
@@ -329,16 +352,22 @@ The automated test suite covers:
 6. Already-used coupon rejection
 7. Multiple users using the same coupon
 8. Transaction failure does not consume the coupon
-9. Concurrent redemption behavior is verified within the integration suite
+9. Concurrent redemption behavior
 
 The concurrency test launches multiple simultaneous redemption attempts for the same user and coupon and verifies that exactly one succeeds and exactly one transaction/redemption is stored.
 
 ## API Documentation
 
-Interactive API documentation is available through Swagger UI:
+Interactive API documentation is available through Swagger UI after starting the application:
 
 ```text
 http://localhost:8080/swagger-ui.html
+```
+
+The OpenAPI specification is available at:
+
+```text
+http://localhost:8080/v3/api-docs
 ```
 
 A Postman collection is also included under:
@@ -349,31 +378,33 @@ postman/One-Time-Coupon-System.postman_collection.json
 
 ## Design Decisions and Trade-offs
 
-### Pessimistic locking
+### Pessimistic Locking
 
 Pessimistic row locking was selected because the primary requirement is correctness under concurrent redemption attempts.
 
 It makes the one-time redemption flow explicit and straightforward to reason about.
 
-### Unique database constraint
+### Unique Database Constraint
 
 The `(user_id, coupon_id)` unique constraint provides defense in depth even if application-level concurrency logic changes in the future.
 
-### Eligibility row as lock target
+### Eligibility Row as Lock Target
 
 Locking the specific user/coupon eligibility row means requests for the same user and coupon are serialized while different users can still redeem the same coupon concurrently.
 
-### PostgreSQL for integration tests
+### PostgreSQL for Integration Tests
 
 Concurrency behavior depends on real database locking semantics, so Testcontainers is used to test against PostgreSQL instead of relying on an in-memory database.
 
-### Transaction processing abstraction
+### Transaction Processing Abstraction
 
-Transaction processing is represented by a `TransactionProcessor` abstraction. This makes transaction failure behavior testable without coupling coupon logic to a specific external payment provider.
+Transaction processing is represented by a `TransactionProcessor` abstraction.
+
+This makes transaction failure behavior testable without coupling coupon logic to a specific external payment provider.
 
 In a production system involving external payment side effects, additional patterns such as idempotency keys, an outbox, or a saga may be appropriate.
 
-### Schema management
+### Schema Management
 
 Hibernate `ddl-auto` is used for this assessment to keep local setup simple.
 
